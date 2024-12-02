@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assignment 4 - Nisha Patange, Angel Castillo, Yixiang Wu</title>
+    <link rel="stylesheet" href="./style.css">
+</head>
+
+<body>
+    <div id="main">
+        <div style="position: absolute; top: 300px;">
+            <div>
+                <label for="userSelection">Baseline Country</label>
+            </div>
+            <select class="custom-select small" id="yScaleSelect" onchange="onYScaleChanged()">
+              <option value="Argentina">Argentina</option>
+              <option value="Australia">Australia</option>
+              <option value="Brazil">Brazil</option>
+              <option value="China">China</option>
+              <option value="Ecuador">Ecuador</option>
+              <option value="India">India</option>
+              <option value="Iran">Iran</option>
+              <option value="Liberia">Liberia</option>
+              <option value="Metric">Madagascar</option>
+              <option value="New Zealand">New Zealand</option>
+              <option value="Niger">Niger</option>
+              <option value="Russia">Russia</option>
+              <option value="Saudi Arabia">Saudi Arabia</option>
+              <option value="Singapore">Singapore</option>
+              <option value="South Africa">South Africa</option>
+              <option value="Switzerland">Switzerland</option>
+              <option value="Trinidad and Tobago">Trinidad and Tobago</option>
+              <option value="United Kingdom">United Kingdom</option>
+              <option value="United States">United States</option>
+              <option value="Zimbabwe">Zimbabwe</option>
+            </select>
+        </div>
+        <div style="margin-left: 160px;">
+            <svg width="600" height="600" style="border: 1px solid #777;">
+            </svg>
+        </div>
+        <div style="margin-left: 380px;">
+            <label for="userSelection">Metric</label>
+            <select class="custom-select small" id="xScaleSelect" onchange="onXScaleChanged()">
+              <option value="GDP Growth (annual %)">GDP Growth (annual %)</option>
+              <option value="Health Expenditure % of GDP">Health Expenditure % of GDP</option>
+              <option value="Education Expenditure % of GDP">Education Expenditure % of GDP</option>
+              <option value="Unemployment (%)">Unemployment (%)</option>
+              <option value="% of Seats Held by Women in National Parliaments">% of Seats Held by Women in National Parliaments</option>
+              <option value="Military Spending as % of GDP">Military Spending as % of GDP</option>
+            </select>
+        </div>
+    </div>
+
+</body>
+<script src="//d3js.org/d3.v5.min.js"></script>
+<script src="./d3-tip.js"></script>
+<script src="./main.js"></script>
+</html>
