@@ -68,7 +68,7 @@ function updateChart() {
     var yScale = d3.scaleBand()
         .domain(filteredData.map(function(d) { return d.country; }))
         .range([0, chartHeight])
-        .padding(0.2);
+        .padding(0.1);
 
     chartG.select('.x-axis').remove();
     chartG.append('g')
@@ -85,17 +85,20 @@ function updateChart() {
         .data(filteredData, function(d) { return d.country; });
 
     bars.exit().remove();
-
+    
     bars.enter().append('rect')
         .attr('class', 'bar')
-        .attr('fill', function(d) { return d.country === country ? 'steelblue' : 'lightgrey'; })
+        .attr('x', function(d) { return xScale(Math.min(0, d.value)); })
+        .attr('y', function(d) { return yScale(d.country); })
+        .attr('height', yScale.bandwidth())
         .merge(bars)
         .transition()
         .duration(750)
         .attr('x', function(d) { return xScale(Math.min(0, d.value)); })
-        .attr('y', function(d) { return yScale(d.country); })
         .attr('width', function(d) { return Math.abs(xScale(d.value) - xScale(0)); })
-        .attr('height', yScale.bandwidth())
+        .attr('y', function(d) { return yScale(d.country); }) // y position to match scale
+        .attr('height', yScale.bandwidth()) // height matches scale 
+        .attr('fill', function(d) { return d.country === country ? 'steelblue' : 'lightgrey'; });
 
     chartG.select('.zero-line').remove();
     chartG.append('line')
