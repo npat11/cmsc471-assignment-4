@@ -1,65 +1,93 @@
-var data;
-var select;
+var dataset = [];
+var metric = 'GDP growth(annual %)';
+var country = 'Argentina';
+var year = 2015;
+var playing = false;
+var yearRange = [2015, 2018];
+var intervalId = null; 
 
-select = d3.select('#xScaleSelect').node();
-var metric = select.options[select.selectedIndex].value;
-select = d3.select('#yScaleSelect').node();
-var country = select.options[select.selectedIndex].value;
+var svg = d3.select('svg'); 
+var padding = { t: 30, r: 30, b: 40, l: 120 };  // Padding 
 
-function onXScaleChanged() {
-    select = d3.select('#xScaleSelect').node();
-    metric = select.options[select.selectedIndex].value;
-    updateChart();
-}
+var chartWidth = +svg.attr('width') - padding.l - padding.r; 
+var chartHeight = +svg.attr('height') - padding.t - padding.b;  
 
-function onYScaleChanged() {
-    select = d3.select('#yScaleSelect').node();
-    country = select.options[select.selectedIndex].value;
-    updateChart();
-}
-
-var svg = d3.select('svg');
-var padding = {t: 30, r: 30, b: 40, l: 120};
-var chartWidth = +svg.attr('width') - padding.l - padding.r;
-var chartHeight = +svg.attr('height') - padding.t - padding.b;
 var chartG = svg.append('g')
     .attr('transform', 'translate(' + [padding.l, padding.t] + ')');
 
-d3.csv('CMSC471 Dataset - Filtered.csv').then(function(dataset) {
-
-    var headerMapping = {
-        'GDP growth (annual %)': 'GDP Growth (annual %)',
-        'health expenditure  % of GDP': 'Health Expenditure % of GDP',
-        'education expenditure % of GDP': 'Education Expenditure % of GDP',
-        'unemployment (%)': 'Unemployment (%)',
-        '% of seats held by women in national parliaments': '% of Seats Held by Women in National Parliaments',
-        'Military Spending as % of GDP': 'Military Spending as % of GDP'
-    };
-
-    data = dataset.filter(function(d) {
-        return d['indicator'] !== 'source' &&
-               d['indicator'] !== 'URL' &&
-               d['indicator'] !== 'notes' &&
-               d['indicator'] !== 'data year';
+// Load
+d3.csv("Filtered2.csv").then(function(data) {
+    data.forEach(function(d) {
+        Object.keys(d).forEach(function(key) {
+            if (key.includes("GDP growth") || key.includes("Military Spending") || key.includes("education expenditure") || key.includes("health expenditure") || key.includes("% of seats") || key.includes("unemployment")) {
+                let value = d[key];
+                if (typeof value === 'string' && value.includes('%')) {
+                    value = value.replace('%', '');
+                    d[key] = +value / 100; 
+                } 
+                else if (!isNaN(value) && value !== '') {
+                    d[key] = +value;
+                }
+            }
+        });
     });
 
-    data = data.map(function(row) {
-        var newRow = {};
-        for (var key in row) {
-            newRow[headerMapping[key.replace(/[\r\n]+/g, ' ')] || key] = row[key];
-        }
-        return newRow;
-    });
+    dataset = data;
 
-    updateChart();
+    updateChart(dataset);
+
+   // play and stop buttons
+    d3.select('#playButton').on('click', startAnimation);
+    d3.select('#stopButton').on('click', stopAnimation);
 });
 
-function updateChart() {
-    var filteredData = data.map(function(d) { 
-        return { country: d['indicator'], value: parseFloat(d[metric]) }; 
-    });
-    filteredData = filteredData.filter(function(d) { return !isNaN(d.value); });
+// Play button function to start animation
+function startAnimation() {
+    if (playing) return;  // Prevent multiple clicks while already playing
 
+    playing = true;
+    intervalId = setInterval(function() {
+        year++;
+        if (year > yearRange[1]) {
+            year = yearRange[0];
+        }
+        updateChart(dataset);
+    }, 1000);  // Update every 1 second
+}
+
+// Stop button function to stop animation
+function stopAnimation() {
+    playing = false;
+    clearInterval(intervalId);  // Stop the interval
+}
+
+// Update chart based on the selected metric, country, and year
+function updateChart(dataset) {
+    var columnName = metric + ' ' + year; 
+    console.log('Column Name:', columnName);
+
+    // Map over the dataset
+    var selectedData = dataset.map(function (row) {
+        var value = row[columnName];
+        console.log(value); 
+        return {
+            country: row['indicator'],
+            value: value
+        };
+    });
+
+    console.log('Selected Data:', selectedData);
+
+    var filteredData = selectedData.filter(function(d) {
+        return !isNaN(d.value);
+    });
+
+    if (filteredData.length === 0) {
+        console.log('No valid data to display!');
+        return;
+    }
+
+    // Set up the scales and chart
     var xDomain = d3.extent(filteredData, function(d) { return d.value; });
     var xScale = d3.scaleLinear()
         .domain([Math.min(0, xDomain[0]), Math.max(0, xDomain[1])])
@@ -81,11 +109,12 @@ function updateChart() {
         .attr('class', 'y-axis')
         .call(d3.axisLeft(yScale));
 
+    // Update
     var bars = chartG.selectAll('.bar')
         .data(filteredData, function(d) { return d.country; });
 
     bars.exit().remove();
-    
+
     bars.enter().append('rect')
         .attr('class', 'bar')
         .attr('x', function(d) { return xScale(Math.min(0, d.value)); })
@@ -96,10 +125,11 @@ function updateChart() {
         .duration(750)
         .attr('x', function(d) { return xScale(Math.min(0, d.value)); })
         .attr('width', function(d) { return Math.abs(xScale(d.value) - xScale(0)); })
-        .attr('y', function(d) { return yScale(d.country); }) // y position to match scale
-        .attr('height', yScale.bandwidth()) // height matches scale 
+        .attr('y', function(d) { return yScale(d.country); })
+        .attr('height', yScale.bandwidth())
         .attr('fill', function(d) { return d.country === country ? 'steelblue' : 'lightgrey'; });
 
+    // Zero-line
     chartG.select('.zero-line').remove();
     chartG.append('line')
         .attr('class', 'zero-line')
