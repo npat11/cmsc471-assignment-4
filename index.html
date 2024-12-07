@@ -8,12 +8,13 @@
 </head>
 
 <body>
-    <div id="main">
+<div id="main">
+    <h2>Please note the changing scale between metrics!</h2>
         <div style="position: absolute; top: 300px;">
             <div>
                 <label for="userSelection">Baseline Country</label>
             </div>
-            <select class="custom-select small" id="yScaleSelect" onchange="onYScaleChanged()">
+            <select class="custom-select small" id="yScaleSelect">
               <option value="Argentina">Argentina</option>
               <option value="Australia">Australia</option>
               <option value="Brazil">Brazil</option>
@@ -36,13 +37,15 @@
               <option value="Zimbabwe">Zimbabwe</option>
             </select>
         </div>
+        <div style="margin-left: 380px; margin-top: 20px;">
+        </div>
         <div style="margin-left: 160px;">
             <svg width="600" height="600" style="border: 1px solid #777;">
             </svg>
         </div>
         <div style="margin-left: 380px;">
             <label for="userSelection">Metric</label>
-            <select class="custom-select small" id="xScaleSelect" onchange="onXScaleChanged()">
+            <select class="custom-select small" id="xScaleSelect">
               <option value="GDP Growth (annual %)">GDP Growth (annual %)</option>
               <option value="Health Expenditure % of GDP">Health Expenditure % of GDP</option>
               <option value="Education Expenditure % of GDP">Education Expenditure % of GDP</option>
@@ -51,6 +54,10 @@
               <option value="Military Spending as % of GDP">Military Spending as % of GDP</option>
             </select>
         </div>
+        <div>
+            <button id="playButton">Play</button>
+            <button id="stopButton">Stop</button>
+          </div>
     </div>
 
 </body>
